@@ -1,0 +1,7 @@
+[submodule "guweb"]
+	path = guweb
+	url = https://github.com/Komako-pw/guweb-osu
+
+[submodule "bancho.py"]
+	path = bancho.py
+	url = https://github.com/osuAkatsuki/bancho.py

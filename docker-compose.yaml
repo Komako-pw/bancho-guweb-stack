@@ -1,0 +1,65 @@
+version: '3'
+
+services:
+  mysql:
+    image: docker.io/mysql:latest
+    restart: always
+    env_file: ./config/mysql.env
+    volumes:
+      - ./bancho.py/migrations/base.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./data/mysql:/var/lib/mysql
+    healthcheck:
+      test: "/usr/bin/mysql --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD --execute \"SHOW DATABASES;\""
+      interval: 10s
+      timeout: 20s
+      retries: 20
+
+  redis:
+    image: docker.io/redis:latest
+    restart: always
+    volumes:
+      - ./data/redis:/data
+
+  bancho:
+    build: ./bancho.py
+    env_file: ./config/bancho.py.env
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    tty: true
+    volumes:
+      - ./data/bancho-guweb:/home/user/bancho.py/.data
+
+  guweb:
+    build: ./guweb
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      bancho:
+        condition: service_started
+    volumes:
+      # idk why it wants /gulag.data instead of /gulag, but it does. DONT TOUCH
+      - ./data/bancho-guweb:/gulag.data
+      - ./config/guweb.py:/app/config.py:ro
+
+  proxy:
+    image: docker.io/caddy:latest
+    env_file: ./config/proxy.env
+    restart: always
+    links:
+      - bancho
+      - guweb
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./data/proxy/data:/data/caddy
+      - ./data/proxy/config:/config
+      - ./data/bancho-guweb/avatars:/srv/bancho/avatars:ro
+      - ./data/bancho-guweb/assets:/srv/bancho/assets:ro
+      - ./config/proxy.Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./config/tls:/etc/caddy/cert:ro

@@ -1,0 +1,119 @@
+##############################################
+# HTTPS. Do not touch anything except (tls) at the bottom
+##############################################
+
+# HTTPS MODE 1: Custom certificate authority
+# For local development
+# You must put ca.crt and ca.key in config/tls/custom_ca
+{
+	pki {
+		ca custom_ca { # dont touch
+			name custom_ca # dont touch
+
+			root { # dont touch
+				cert /etc/caddy/cert/custom_ca/ca.crt # dont touch
+				key /etc/caddy/cert/custom_ca/ca.key # dont touch
+			}
+		}
+	}
+}
+(tls_custom_ca) {
+	tls {
+		issuer internal { # dont touch
+			ca custom_ca # dont touch
+		}
+	}
+}
+
+# HTTPS MODE 2: Custom certificate
+# You must put cert.pem and key.pem in config/tls/custom_cert
+(tls_custom_cert) {
+    # dont touch
+    tls /etc/caddy/cert/custom_cert/cert.pem /etc/caddy/cert/custom_cert/key.pem
+}
+
+# HTTPS MODE 3: Automatic certificate with Cloudflare
+# You must set CLOUDFLARE_API_TOKEN in proxy.env
+(tls_cloudflare) {
+    tls {
+        # dont touch. instead touch proxy.env
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
+}
+
+# HTTPS mode 4: Automatic certificate with Let's Encrypt
+# No configuration required, but your certificate will only last 90 days
+# And this will not work on localhost
+(tls_auto) {
+    # dont touch
+}
+
+# !!! Choose your HTTPS mode here
+(tls) {
+    import tls_custom_ca
+}
+
+# !!! Enable/disable proxy logs here
+(access_log) {
+    # log {
+    #     output stdout
+    # }
+}
+
+##############################################
+# Domains
+##############################################
+
+# Usually, dont touch anything here
+
+api.{env.DOMAIN}, osu.{env.DOMAIN}, b.{env.DOMAIN}, c.{env.DOMAIN}, c1.{env.DOMAIN}, c2.{env.DOMAIN}, c3.{env.DOMAIN}, c4.{env.DOMAIN}, c5.{env.DOMAIN}, c6.{env.DOMAIN}, ce.{env.DOMAIN} {
+    import tls
+    import access_log
+    encode gzip
+
+    header Access-Control-Allow-Origin "*"
+
+    # dont touch
+    reverse_proxy bancho {
+		header_up X-Real-IP {remote_host}
+	}
+
+    request_body {
+		max_size 20MB
+	}
+}
+
+a.{env.DOMAIN} {
+    import tls
+    import access_log
+    encode gzip
+
+    root * /srv/bancho/avatars # dont touch
+    try_files {path} {file.base}.png {file.base}.jpg {file.base}.gif {file.base}.jpeg {file.base}.jfif default.jpg =404
+
+    file_server
+}
+
+assets.{env.DOMAIN} {
+    import tls
+    import access_log
+    encode gzip
+
+    file_server {
+        root /srv/bancho/assets # dont touch
+    }
+}
+
+https://{env.DOMAIN} {
+    import tls
+    import access_log
+    encode gzip
+
+    # dont touch
+    @bancho path_regexp ^/(web|api|users|ss|d|p|beatmaps|beatmapsets|community|difficulty-rating|topg_callback|discord_oauth_callback)(/.*)?$
+    reverse_proxy @bancho bancho {
+        header_up X-Real-IP {remote_host}
+    }
+
+    reverse_proxy guweb:8000 # dont touch
+}

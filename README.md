@@ -11,12 +11,13 @@ Works locally and in production.
 - Copy `config.example` to `config`
 - Configure as needed
     - Place relevant certificates in `config/tls`
+        - If you're using this on LAN, look at the [custom CA](#custom-ca) section
+        - If you're using this on the open web, you may not need this at all
     - Adjust `config/bancho.py.env` and `config/guweb.py` configs to your needs
         - Make sure to set your domain
-    - Adjust `proxy.Caddyfile` and `proxy.env`
-        - Select the correct TLS mode
-        - Make sure to set your domain
-    - Optionally, set a custom mysql password in `config/mysql.env`, but it's not necessary
+    - Select the correct tls mode in `config/proxy.Caddyfile`
+    - Set your domain in `config/proxy.env`
+    - Setting a custom mysql password in `config/mysql.env` is not necessary
 - If on Linux (otherwise skip):
     - Run `docker-compose up`, wait for it to finish (it will crash due to permission denied)
     - `sudo chown -R 1000:1000 ./data` (to fix crashing)

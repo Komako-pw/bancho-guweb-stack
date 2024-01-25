@@ -42,7 +42,8 @@ services:
       bancho:
         condition: service_started
     volumes:
-      # idk why it wants /gulag.data instead of /gulag, but it does. DONT TOUCH
+      - ./data/bancho-guweb:/gulag
+      # it wants /gulag.data as well as /gulag due to some bug
       - ./data/bancho-guweb:/gulag.data
       - ./config/guweb.py:/app/config.py:ro
 

@@ -7,9 +7,12 @@ Works locally and in production.
 
 - Install docker and docker-compose
 - Clone this repo **recursively** (to get the submodules)
-> `git clone --recursive https://github.com/Komako-pw/stack`
+> IMPORTANT! If you don't use --recursive or download a zip from the web, you will be missing the submodules and it won't work.
+```
+git clone --recursive https://github.com/Komako-pw/stack
+```
 - Copy `config.example` to `config`
-- Configure as needed
+- Configure
     - Place relevant certificates in `config/tls`
         - If you're using this on LAN, look at the [custom CA](#custom-ca) section
         - If you're using this on the open web, you may not need this at all
@@ -18,9 +21,11 @@ Works locally and in production.
     - Select the correct tls mode in `config/proxy.Caddyfile`
     - Set your domain in `config/proxy.env`
     - Setting a custom mysql password in `config/mysql.env` is not necessary
-- If on Linux (otherwise skip):
-    - Run `docker-compose up`, wait for it to finish (it will crash due to permission denied)
-    - `sudo chown -R 1000:1000 ./data` (to fix crashing)
+- If on Linux (skip on Windows):
+    ```
+    mkdir -p data/bancho-guweb data/mysql data/redis data/proxy
+    sudo chown -R 1000:1000 ./data
+    ```
 - Start the stack
 > `docker-compose up -d`
 

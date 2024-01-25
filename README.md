@@ -27,7 +27,9 @@ git clone --recursive https://github.com/Komako-pw/stack
     sudo chown -R 1000:1000 ./data
     ```
 - Start the stack
-> `docker-compose up -d`
+```
+docker-compose up -d
+```
 
 ## Custom CA
 You need a custom certificate authority (CA) to use HTTPS **locally**. Since Caddy is running in a container, it can't access your system's trusted CAs.

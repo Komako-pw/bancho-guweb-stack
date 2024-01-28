@@ -9,7 +9,7 @@ Works locally and in production.
 - Clone this repo **recursively** (to get the submodules)
 > IMPORTANT! If you don't use --recursive or download a zip from the web, you will be missing the submodules and it won't work.
 ```
-git clone --recursive https://github.com/Komako-pw/stack
+git clone --recursive https://github.com/Komako-pw/bancho-guweb-stack
 ```
 - Copy `config.example` to `config`
 - Configure

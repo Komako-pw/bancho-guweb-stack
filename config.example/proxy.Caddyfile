@@ -27,25 +27,10 @@
 
 # HTTPS MODE 2: Custom certificate
 # You must put cert.pem and key.pem in config/tls/custom_cert
+# Use a cloudflare origin certificate if possible
 (tls_custom_cert) {
     # dont touch
     tls /etc/caddy/cert/custom_cert/cert.pem /etc/caddy/cert/custom_cert/key.pem
-}
-
-# HTTPS MODE 3: Automatic certificate with Cloudflare
-# You must set CLOUDFLARE_API_TOKEN in proxy.env
-(tls_cloudflare) {
-    tls {
-        # dont touch. instead touch proxy.env
-        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-    }
-}
-
-# HTTPS mode 4: Automatic certificate with Let's Encrypt
-# No configuration required, but your certificate will only last 90 days
-# And this will not work on localhost
-(tls_auto) {
-    # dont touch
 }
 
 # !!! Choose your HTTPS mode here
